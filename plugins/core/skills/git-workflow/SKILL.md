@@ -81,7 +81,7 @@ Antes de abrir el PR:
 3. Autorevisión del diff con `core:code-review-checklist`.
 4. Docs y `.env.example` actualizados.
 
-Con GitHub CLI: `gh pr create --title "<conventional title>" --body-file <archivo>` (solo si el usuario lo pidió).
+Con GitHub CLI: `gh pr create --title "<conventional title>" --body-file <archivo>`; con GitLab CLI: `glab mr create --title "<conventional title>" --description "$(cat <archivo>)"` (solo si el usuario lo pidió). El comando `/mr` genera la descripción a partir del diff y la conversación.
 
 ## Recuperación segura
 

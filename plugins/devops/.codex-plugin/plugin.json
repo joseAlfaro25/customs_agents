@@ -1,6 +1,6 @@
 {
   "name": "devops",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Agentes y skills para Docker, CI/CD, Kubernetes e infraestructura como código",
   "author": {
     "name": "Jose Alfaro"
