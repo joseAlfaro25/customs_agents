@@ -236,7 +236,120 @@ def test_responder():
 
 Prueba nodos y funciones de enrutamiento como funciones puras (reciben un estado, devuelven un dict), y tools por separado del modelo.
 
-## 8. Checklist y errores comunes
+## 8. Agentes declarativos con `definition.json`
+
+Cuando tienes varios agentes parecidos (por país, cliente o canal), conviene separar *qué* es cada agente (config) de *cómo* se ejecuta (código). Un `definition.json` describe el agente y un código genérico lo convierte en objetos de LangChain/LangGraph. Así, para cambiar un prompt, un modelo o las tools de un agente solo editas el JSON.
+
+**Estructura típica**
+
+```json
+{
+  "name": "agente_agenda_co",
+  "tone": "co_tone",
+  "agents_router": {
+    "prompt_settings": { "prompt": "agents_router", "version": { "dev": "e4f20270", "prod": "e4f20270" } },
+    "model_settings": {
+      "azure":  { "model": "gpt-4.1", "model_provider": "azure_openai", "api_key": "ENV_AZURE_OPENAI_API_KEY",
+                  "azure_endpoint": "ENV_AZURE_OPENAI_ENDPOINT", "api_version": "2024-10-21", "temperature": "0.0" },
+      "openai": { "model": "gpt-4.1", "model_provider": "openai", "api_key": "ENV_OPENAI_API_KEY", "temperature": "0.0" }
+    }
+  },
+  "agent": {
+    "communications": {
+      "name": "communication_agent",
+      "description": "Envía al usuario los mensajes producidos por otros agentes.",
+      "type": "agent_with_tools",
+      "prompt_settings": {
+        "prompt": "co_communication",
+        "version": { "dev": "f5db4621", "prod": "f5db4621" },
+        "inputs": {
+          "tone": { "kind": "template", "template": "co_tone", "version": "prod" },
+          "fecha": { "kind": "date", "format": "%Y-%m-%d %H:%M" },
+          "extra": { "kind": "value", "value": "Texto fijo que se inyecta en el prompt" }
+        }
+      },
+      "model_settings": { "azure": { "...": "..." }, "openai": { "...": "..." } },
+      "tools": ["send_message"],
+      "terminal_tools": ["send_message"]
+    },
+    "continuar_flujo": {
+      "name": "continue_agent",
+      "description": "Avanza el flujo sin LLM.",
+      "type": "direct_tool_executor",
+      "tools": ["continue_flow"]
+    }
+  },
+  "tools": {
+    "offer_days": { "prompt_settings": { "...": "..." }, "model_settings": { "...": "..." } }
+  }
+}
+```
+
+| Bloque | Para qué sirve |
+|---|---|
+| `agents_router` | Prompt y modelo del nodo que decide a qué subagente delegar |
+| `agent.<clave>` | Cada subagente: `name` y `description` (el router los lee para decidir), `type`, prompt, modelo y `tools` |
+| `agent.<clave>.type` | Qué runnable se construye: agente con LLM + tools, ejecutor directo de una tool (sin LLM), workflow externo… |
+| `terminal_tools` | Tools que terminan el subagente al ejecutarse bien (p. ej. `send_message`, para que no reenvíe el mensaje) |
+| `tools.<nombre>` | Configuración propia de una tool (su prompt/modelo si usa LLM, embeddings si es un retriever) |
+| `prompt_settings` | Nombre del prompt en LangSmith Hub + versión (commit) por ambiente + variables (`inputs`) |
+| `model_settings` | Parámetros de `init_chat_model` por proveedor; los secretos van como referencias `ENV_*` |
+
+**Cómo se consume (esqueleto genérico)**
+
+```python
+import json, os
+from copy import deepcopy
+from langchain.chat_models import init_chat_model
+from langchain_core.tools import StructuredTool
+from langsmith import Client
+
+ENV = os.getenv("ENV", "dev")
+hub = Client()
+
+def resolver_modelo(model_settings: dict, proveedor: str):
+    cfg = deepcopy(model_settings[proveedor])           # no mutar la definición
+    cfg = {k: os.getenv(v, "") if isinstance(v, str) and v.startswith("ENV_") else v
+           for k, v in cfg.items()}
+    return init_chat_model(**cfg)
+
+def resolver_prompt(ps: dict):
+    version = ps["version"].get(ENV) if isinstance(ps["version"], dict) else ps["version"]
+    prompt = hub.pull_prompt(f"{ps['prompt']}:{version}")
+    variables = {nombre: resolver_input(i) for nombre, i in ps.get("inputs", {}).items()}
+    return prompt.partial(**variables)                  # kind: value | template | date
+
+def construir_tools(nombres: list[str], impl) -> list[StructuredTool]:
+    # cada nombre del JSON corresponde a un método/función del código
+    return [StructuredTool.from_function(func=getattr(impl, n), name=n) for n in nombres]
+
+RUNNABLES = {                                           # registro: type -> constructor
+    "agent_with_tools": crear_agente_con_tools,         # grafo llm <-> tools (sección 6)
+    "direct_tool_executor": crear_ejecutor_directo,     # llama la única tool, sin LLM
+}
+
+def cargar(path: str, impl, proveedor: str = "azure"):
+    d = json.load(open(path))
+    subagentes = {
+        a["name"]: RUNNABLES[a.get("type", "agent_with_tools")](a, impl, proveedor)
+        for a in d["agent"].values()
+    }
+    router = resolver_prompt(d["agents_router"]["prompt_settings"]) | \
+             resolver_modelo(d["agents_router"]["model_settings"], proveedor)
+    return construir_grafo_router(router, subagentes)   # StateGraph supervisor (sección 6)
+```
+
+**Reglas**
+
+- La definición es **datos**, no código: nada de lógica en el JSON, y el código no debe tener nombres de prompts ni modelos fijos.
+- Secretos siempre como referencia (`ENV_*` o nombre del secreto en tu gestor), nunca el valor.
+- Versiona prompts por commit hash por ambiente. Al promover un prompt, actualiza **`dev` y `prod`** al mismo hash; si solo cambias `dev`, producción se queda desactualizada sin que nadie lo note.
+- El proveedor se decide en dos niveles: uno por defecto en el código y un `model_provider` opcional por subagente que lo sobrescribe.
+- Valida la definición al arrancar (modelo Pydantic: `type` conocido, tools existentes, `direct_tool_executor` con exactamente una tool) para fallar en el deploy y no en mitad de una conversación.
+- Para replicar un agente a otro país o cliente, copia la definición y cambia prompts/versiones. Revisa que el prompt nuevo cubra los mismos casos borde que el original.
+- Opcional: A/B testing declarando `variants` + `weights` en un agente y persistiendo la variante asignada a cada usuario.
+
+## 9. Checklist y errores comunes
 
 **Estructura sugerida del módulo**
 
@@ -261,6 +374,7 @@ tests/
 - [ ] Tracing con metadata suficiente para encontrar una conversación concreta.
 - [ ] Dataset de evaluación y comparación A/B para cada cambio de prompt.
 - [ ] Nada de secretos ni PII innecesaria en prompts o metadata de trazas.
+- [ ] Si usas `definition.json`: validado al arrancar y versiones de prompt `dev`/`prod` alineadas al promover.
 
 **Errores comunes**
 

@@ -197,7 +197,7 @@ También puedes invocar cualquier agente directamente, p. ej. *"usa el agente ba
 
 ## Guías
 
-- [Guía rápida: LangChain y LangGraph](docs/guia-langchain-langgraph.md): cuándo usar cada una, bloques básicos, estado y grafos, memoria, patrones (ReAct, router, human-in-the-loop), observabilidad, testing y checklist de producción.
+- [Guía rápida: LangChain y LangGraph](docs/guia-langchain-langgraph.md): cuándo usar cada una, bloques básicos, estado y grafos, memoria, patrones (ReAct, router, human-in-the-loop), observabilidad, testing, agentes declarativos con `definition.json` y checklist de producción.
 
 ## Hooks
 
