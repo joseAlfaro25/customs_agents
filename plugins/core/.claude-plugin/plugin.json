@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Agentes generales (planificación, arquitectura, código, testing, review, documentación) y la información compartida que usan todos los plugins",
   "author": {
     "name": "Jose Alfaro"

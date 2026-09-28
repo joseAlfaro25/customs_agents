@@ -46,7 +46,7 @@ plugins/
 │   ├── agents/    planner, architect, coder, tester, reviewer, documenter
 │   ├── skills/    project-context, coding-standards, planning-method, architecture-principles,
 │   │              testing-strategy, code-review-checklist, documentation-standards, git-workflow
-│   ├── commands/  /plan, /design, /implement, /write-tests, /review, /document, /feature, /standard, /mr
+│   ├── commands/  /plan, /design, /implement, /write-tests, /review, /document, /feature, /standard, /write-mr
 │   └── hooks/     guard.py — pide confirmación antes de tocar secretos o correr comandos destructivos
 ├── frontend/
 │   ├── agents/    nextjs-developer, react-developer, typescript-expert, frontend-reviewer
@@ -191,7 +191,7 @@ Qué adapta el export:
 | Documentar | `/document` |
 | Todo el flujo | `/feature <descripción>` |
 | Todo el flujo con los estándares completos y su checklist | `/standard <descripción>` |
-| Escribir el MR/PR (qué, por qué, cómo, cómo probarlo) | `/mr` · `/mr develop --create` |
+| Escribir el MR/PR (qué, por qué, cómo, cómo probarlo) | `/write-mr` · `/write-mr develop --create` |
 
 Si un nombre de comando choca con otro plugin, usa la forma con namespace: `/core:review`, `/backend:new-langgraph-agent`, etc.
 

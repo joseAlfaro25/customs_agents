@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Suite de agentes, skills y plugins para frontend, backend, devops y mobile",
-    "version": "0.5.1"
+    "version": "0.5.2"
   },
   "plugins": [
     {
