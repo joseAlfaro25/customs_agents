@@ -37,6 +37,7 @@ Fuente única en formato de plugins de Claude Code, compatible con **Codex, Curs
 install.sh                          # instalador de un comando (todas las IAs)
 scripts/export.py                   # convierte la suite a Codex, Cursor, Copilot, Gemini, genérico
 scripts/bump-version.py             # sube la versión de todos los plugins antes de publicar
+docs/                               # guías para personas (no las cargan los agentes)
 .claude-plugin/marketplace.json     # marketplace (lo leen Claude Code y Codex)
 .agents/plugins/marketplace.json    # marketplace nativo de Codex
 plugins/
@@ -193,6 +194,10 @@ Qué adapta el export:
 Si un nombre de comando choca con otro plugin, usa la forma con namespace: `/core:review`, `/backend:new-langgraph-agent`, etc.
 
 También puedes invocar cualquier agente directamente, p. ej. *"usa el agente backend:langgraph-developer para..."*.
+
+## Guías
+
+- [Guía rápida: LangChain y LangGraph](docs/guia-langchain-langgraph.md): cuándo usar cada una, bloques básicos, estado y grafos, memoria, patrones (ReAct, router, human-in-the-loop), observabilidad, testing y checklist de producción.
 
 ## Hooks
 
