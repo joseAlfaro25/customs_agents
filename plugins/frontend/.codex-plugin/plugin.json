@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Agentes y skills para Next.js, React y TypeScript",
   "author": {
     "name": "Jose Alfaro"

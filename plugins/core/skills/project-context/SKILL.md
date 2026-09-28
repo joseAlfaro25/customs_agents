@@ -79,7 +79,7 @@ core:planner → core:architect (si hay decisiones de diseño) → core:coder / 
 ```
 
 - Cada agente general **delega en el especialista de stack** cuando la tarea es 100 % de una tecnología (p. ej. un router FastAPI nuevo → `backend:fastapi-developer`) y actúa como coordinador cuando cruza varias (p. ej. endpoint + pantalla web + pantalla mobile).
-- El comando `/feature` ejecuta el flujo completo.
+- El comando `/feature` ejecuta el flujo completo; `/standard` hace lo mismo forzando los estándares completos (incluido el `*-project-standard` del stack) y verificando su checklist al final.
 
 ## 6. Resumen de contexto (salida de esta skill)
 
