@@ -1,0 +1,20 @@
+{
+  "name": "backend",
+  "version": "0.4.0",
+  "description": "Agentes y skills para NestJS, FastAPI y LLMs con LangChain, LangGraph y LangSmith",
+  "author": {
+    "name": "Jose Alfaro"
+  },
+  "keywords": [
+    "backend",
+    "nestjs",
+    "fastapi",
+    "python",
+    "api",
+    "langchain",
+    "langgraph",
+    "langsmith",
+    "llm",
+    "ai"
+  ]
+}

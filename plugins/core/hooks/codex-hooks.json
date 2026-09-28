@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/guard.py\" --codex",
+            "timeout": 10,
+            "statusMessage": "core guard"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "mobile",
+  "version": "0.4.0",
+  "description": "Agentes y skills para apps móviles con React Native y Expo",
+  "author": {
+    "name": "Jose Alfaro"
+  },
+  "keywords": [
+    "mobile",
+    "react-native",
+    "expo",
+    "ios",
+    "android",
+    "typescript"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/codex-hooks.json",
+  "interface": {
+    "displayName": "My Agents · Mobile",
+    "shortDescription": "React Native y Expo",
+    "longDescription": "Agentes y skills para apps móviles con React Native y Expo",
+    "category": "Coding"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "description": "Formatea automáticamente archivos Terraform (.tf/.tfvars) tras escribirlos o editarlos",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/format.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

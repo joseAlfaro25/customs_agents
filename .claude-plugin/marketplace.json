@@ -1,0 +1,42 @@
+{
+  "name": "my-agents",
+  "owner": {
+    "name": "Jose Alfaro"
+  },
+  "metadata": {
+    "description": "Suite de agentes, skills y plugins para frontend, backend, devops y mobile",
+    "version": "0.4.0"
+  },
+  "plugins": [
+    {
+      "name": "suite",
+      "source": "./plugins/suite",
+      "description": "Instala TODA la suite de una vez (core, frontend, backend, devops, mobile)"
+    },
+    {
+      "name": "core",
+      "source": "./plugins/core",
+      "description": "Agentes generales (planner, architect, coder, tester, reviewer, documenter) e información compartida del proyecto. Recomendado instalar junto con los plugins de stack"
+    },
+    {
+      "name": "frontend",
+      "source": "./plugins/frontend",
+      "description": "Agentes y skills para Next.js, React y TypeScript"
+    },
+    {
+      "name": "backend",
+      "source": "./plugins/backend",
+      "description": "Agentes y skills para NestJS, FastAPI, LangChain, LangGraph y LangSmith"
+    },
+    {
+      "name": "devops",
+      "source": "./plugins/devops",
+      "description": "Agentes y skills para Docker, GitHub Actions, Kubernetes y Terraform"
+    },
+    {
+      "name": "mobile",
+      "source": "./plugins/mobile",
+      "description": "Agentes y skills para React Native y Expo"
+    }
+  ]
+}

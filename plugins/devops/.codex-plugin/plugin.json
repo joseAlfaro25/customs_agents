@@ -1,0 +1,24 @@
+{
+  "name": "devops",
+  "version": "0.4.0",
+  "description": "Agentes y skills para Docker, CI/CD, Kubernetes e infraestructura como código",
+  "author": {
+    "name": "Jose Alfaro"
+  },
+  "keywords": [
+    "devops",
+    "docker",
+    "kubernetes",
+    "ci-cd",
+    "github-actions",
+    "terraform"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/codex-hooks.json",
+  "interface": {
+    "displayName": "My Agents · DevOps",
+    "shortDescription": "Docker, GitHub Actions, Kubernetes y Terraform",
+    "longDescription": "Agentes y skills para Docker, CI/CD, Kubernetes e infraestructura como código",
+    "category": "Coding"
+  }
+}
