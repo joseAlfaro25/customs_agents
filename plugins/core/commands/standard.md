@@ -1,6 +1,6 @@
 ---
 description: "Flujo completo de una feature aplicando los estándares completos de la suite (código, testing, stack y estándar de proyecto) y verificándolos al final con su checklist"
-argument-hint: "<descripción de la tarea o feature>"
+argument-hint: "[front|back|ia|mobile|devops] <descripción de la tarea o feature>"
 ---
 
 Desarrolla con los estándares completos: $ARGUMENTS
@@ -10,13 +10,14 @@ Si `$ARGUMENTS` está vacío, pide la descripción de la tarea y detente.
 ## 1. Cargar contexto y fijar los estándares
 
 1. Carga `core:project-context`, ejecuta el detector de stack y lee `CLAUDE.md`/`AGENTS.md`.
-2. Arma la **lista de estándares obligatorios** para esta tarea:
+2. **Especialidad**: si la primera palabra de `$ARGUMENTS` es una especialidad (`front`, `back`, `ia`, `mobile`, `devops` o sus alias), aplica las reglas de `core:project-context` §3.1: estándares, agentes, reviewer y verificación se limitan a esa especialidad, y todo cambio fuera de ella se reporta como dependencia en vez de hacerse. Sin especialidad, sigue la autodetección de abajo.
+3. Arma la **lista de estándares obligatorios** para esta tarea (con especialidad, solo las filas de abajo que correspondan a ella):
    - Siempre: `core:coding-standards`, `core:testing-strategy`, `core:code-review-checklist`, `core:documentation-standards`.
    - Next.js: `frontend:nextjs-project-standard` (completo, aunque el proyecto ya exista), `frontend:nextjs-app-router`, `frontend:react-components`, `frontend:typescript-patterns`, `frontend:frontend-testing`.
    - React sin Next: `frontend:react-components`, `frontend:typescript-patterns`, `frontend:frontend-testing`.
    - Expo / React Native: `mobile:expo-project-standard` (completo, aunque el proyecto ya exista), `mobile:react-native-components`, `mobile:expo-router-navigation`, `mobile:mobile-state-data`, `mobile:mobile-testing`.
    - Backend, IA y devops: todas las skills del mapa de `core:project-context` para los stacks que toca la tarea (p. ej. `backend:fastapi-endpoint` + `backend:database-patterns` + `backend:backend-testing`; `backend:langgraph-agents` + `backend:langsmith-observability`).
-3. Muestra la lista al usuario en una línea por skill.
+4. Muestra la lista al usuario en una línea por skill, indicando la especialidad si la hay.
 
 **Precedencia**: `CLAUDE.md` del proyecto > estándar de proyecto (`*-project-standard`) > skills de stack > `core:coding-standards`. Si el código existente contradice el estándar, el código **nuevo** sigue el estándar; no migres código existente fuera del alcance: anota la desviación y pregunta.
 
@@ -41,12 +42,14 @@ Resumen final:
 
 ```markdown
 ## <nombre de la tarea>
+- Especialidad: <front | back | ia | mobile | devops | autodetectada>
 - Estándares aplicados: ...
 - Plan / ADR: ...
 - Archivos cambiados: ...
 - Verificación: <comando> → resultado
 - Checklist del estándar: X ✅ · Y ❌ · Z N/A (detalle de los ❌)
 - Desviaciones del código existente (no migradas): ...
+- Dependencias fuera de la especialidad (no hechas): ...
 - Review: veredicto y hallazgos pendientes
 - Siguiente paso: commit / PR (solo si el usuario lo pide, siguiendo core:git-workflow)
 ```

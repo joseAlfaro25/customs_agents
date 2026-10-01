@@ -1,11 +1,13 @@
 ---
 description: "Flujo completo de una feature: planificar, diseñar si hace falta, implementar, testear, revisar y documentar"
-argument-hint: "<descripción de la feature>"
+argument-hint: "[front|back|ia|mobile|devops] <descripción de la feature>"
 ---
 
 Desarrolla la feature: $ARGUMENTS
 
 Si `$ARGUMENTS` está vacío, pide la descripción de la feature y detente.
+
+**Especialidad**: si la primera palabra de `$ARGUMENTS` es una especialidad (`front`, `back`, `ia`, `mobile`, `devops` o sus alias), carga `core:project-context` y aplica sus reglas de §3.1 en todas las fases: el plan, la implementación, los tests y el review se limitan a esa especialidad (agentes y reviewer de su fila), y lo que requiera otra se reporta como dependencia sin hacerse. Sin especialidad, el flujo se autodetecta como siempre.
 
 Ejecuta las fases en orden. Entre fases, muestra un resumen corto de lo hecho y **pide confirmación al usuario antes de pasar a la implementación** (fase 3). El resto continúa automáticamente salvo que haya bloqueos.
 
@@ -20,6 +22,7 @@ Resumen final:
 
 ```markdown
 ## Feature: <nombre>
+- Especialidad: <front | back | ia | mobile | devops | autodetectada>
 - Plan: <resumen / pasos>
 - ADR: <ruta o "no aplica">
 - Archivos cambiados: ...

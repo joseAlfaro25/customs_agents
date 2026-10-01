@@ -193,6 +193,20 @@ Qué adapta el export:
 | Todo el flujo con los estándares completos y su checklist | `/standard <descripción>` |
 | Escribir el MR/PR (qué, por qué, cómo, cómo probarlo) | `/write-mr` · `/write-mr develop --create` |
 
+### Por especialidad
+
+`/feature`, `/standard` e `/implement` aceptan una **especialidad** como primer argumento para trabajar solo en un frente (sus skills, sus agentes, su reviewer y los scripts de verificación de ese proyecto). Sin especialidad, autodetectan el stack como siempre.
+
+| Especialidad (alias) | Frente | Ejemplo |
+|---|---|---|
+| `front` (`frontend`, `web`) | Next.js · React · TypeScript | `/standard front filtro de pedidos con estados de carga y error` |
+| `back` (`backend`, `api`) | NestJS · FastAPI · base de datos | `/feature back endpoint para exportar pedidos a CSV` |
+| `ia` (`ai`, `llm`) | LangChain · LangGraph · LangSmith | `/implement ia agente de soporte con human-in-the-loop` |
+| `mobile` (`movil`) | Expo · React Native | `/standard mobile pantalla de detalle de pedido` |
+| `devops` (`infra`) | Docker · CI/CD · Kubernetes · Terraform | `/feature devops pipeline de deploy a staging` |
+
+Con especialidad, la suite no sale de su frente: si el trabajo de `front` necesita un endpoint nuevo, lo reporta como dependencia (qué contrato hace falta) y te pregunta si lo corre aparte con `back`. La tabla completa está en `core:project-context` §3.1.
+
 Si un nombre de comando choca con otro plugin, usa la forma con namespace: `/core:review`, `/backend:new-langgraph-agent`, etc.
 
 También puedes invocar cualquier agente directamente, p. ej. *"usa el agente backend:langgraph-developer para..."*.

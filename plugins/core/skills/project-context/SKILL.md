@@ -59,6 +59,27 @@ Tabla completa de señales (lockfiles, archivos de config, variantes) en [refere
 
 Si un plugin de stack no está instalado, la skill no existe: sigue con las skills `core:*` y la documentación oficial.
 
+### 3.1 Especialidades (alcance explícito)
+
+Los comandos `/feature`, `/standard` e `/implement` aceptan una **especialidad** como primer argumento (`/standard front agregar filtro de pedidos`) para limitar el trabajo a un solo frente en lugar de autodetectar todos los stacks.
+
+| Especialidad (alias) | Alcance | Skills (solo las que apliquen al stack detectado) | Agentes | Reviewer |
+|---|---|---|---|---|
+| `front` (`frontend`, `web`) | Next.js, React, TypeScript web | `frontend:nextjs-project-standard`, `frontend:nextjs-app-router`, `frontend:react-components`, `frontend:typescript-patterns`, `frontend:frontend-testing` | `frontend:nextjs-developer`, `frontend:react-developer`, `frontend:typescript-expert` | `frontend:frontend-reviewer` |
+| `back` (`backend`, `api`) | NestJS, FastAPI, base de datos, contratos de API | `backend:nestjs-module`, `backend:fastapi-endpoint`, `backend:database-patterns`, `backend:backend-testing` | `backend:nestjs-developer`, `backend:fastapi-developer`, `backend:api-designer` | `backend:backend-reviewer` |
+| `ia` (`ai`, `llm`) | LangChain, LangGraph, LangSmith | `backend:langchain-chains`, `backend:langchain-rag`, `backend:langgraph-agents`, `backend:langsmith-observability`, `backend:backend-testing` | `backend:langchain-developer`, `backend:langgraph-developer`, `backend:langsmith-specialist` | `backend:backend-reviewer` |
+| `mobile` (`movil`) | Expo, React Native | `mobile:expo-project-standard`, `mobile:react-native-components`, `mobile:expo-router-navigation`, `mobile:mobile-state-data`, `mobile:mobile-testing` | `mobile:expo-developer`, `mobile:react-native-developer` | `mobile:mobile-reviewer` |
+| `devops` (`infra`) | Docker, CI/CD, Kubernetes, Terraform | `devops:docker`, `devops:github-actions`, `devops:kubernetes`, `devops:terraform` | `devops:devops-engineer`, `devops:iac-developer`, `devops:cloud-architect` (solo diseño) | `devops:security-auditor` |
+
+Cómo aplicarla (los comandos remiten aquí):
+
+1. **Parseo**: si la primera palabra de `$ARGUMENTS` (sin distinguir mayúsculas) es una especialidad o alias de la tabla, esa es la especialidad y el resto es la descripción. Si no coincide, no hay especialidad y todo funciona como siempre (autodetección). Si tras la especialidad no queda descripción, pídela y detente.
+2. **Skills**: `core:*` de siempre + las de la fila, **filtradas por lo detectado** (en `front` sin Next.js no se cargan las `nextjs-*`; en `back` solo el framework presente).
+3. **Agentes**: solo los de la fila, más los generales (`core:planner`, `core:architect`, `core:tester`, `core:documenter`). El review usa `core:reviewer` + el reviewer de la fila; no lances los de otros stacks.
+4. **Frontera**: toca únicamente archivos de esa especialidad. Si la tarea necesita un cambio fuera (p. ej. un endpoint nuevo desde `front`), no lo hagas: déjalo como dependencia (qué contrato o cambio se necesita) y pregunta si se corre aparte con la otra especialidad.
+5. **Verificación**: en monorepos, ejecuta los scripts (`lint`, `typecheck`, `test`, `build`) del proyecto de esa especialidad, no de todos.
+6. **Sin señales**: si el repo no tiene nada de esa especialidad, dilo y pregunta antes de seguir (puede que falte el proyecto o que se refiera a otra).
+
 ## 4. Skills generales (aplican a todo stack)
 
 | Necesidad | Skill |
@@ -79,7 +100,7 @@ core:planner → core:architect (si hay decisiones de diseño) → core:coder / 
 ```
 
 - Cada agente general **delega en el especialista de stack** cuando la tarea es 100 % de una tecnología (p. ej. un router FastAPI nuevo → `backend:fastapi-developer`) y actúa como coordinador cuando cruza varias (p. ej. endpoint + pantalla web + pantalla mobile).
-- El comando `/feature` ejecuta el flujo completo; `/standard` hace lo mismo forzando los estándares completos (incluido el `*-project-standard` del stack) y verificando su checklist al final.
+- El comando `/feature` ejecuta el flujo completo; `/standard` hace lo mismo forzando los estándares completos (incluido el `*-project-standard` del stack) y verificando su checklist al final. Ambos, e `/implement`, aceptan una especialidad (`front`, `back`, `ia`, `mobile`, `devops`; ver 3.1) para acotar el trabajo a un solo frente.
 
 ## 6. Resumen de contexto (salida de esta skill)
 
