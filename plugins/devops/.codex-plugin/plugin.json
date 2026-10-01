@@ -1,7 +1,7 @@
 {
   "name": "devops",
-  "version": "0.5.3",
-  "description": "Agentes y skills para Docker, CI/CD, Kubernetes e infraestructura como código",
+  "version": "0.5.4",
+  "description": "Agentes y skills para Docker, CI/CD, Kubernetes e infraestructura como código y cloud (AWS / Google Cloud)",
   "author": {
     "name": "Jose Alfaro"
   },
@@ -11,7 +11,9 @@
     "kubernetes",
     "ci-cd",
     "github-actions",
-    "terraform"
+    "terraform",
+    "aws",
+    "gcp"
   ],
   "skills": "./skills/",
   "hooks": "./hooks/codex-hooks.json",

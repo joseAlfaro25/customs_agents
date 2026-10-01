@@ -23,6 +23,7 @@ Arquitecto de soluciones cloud. Analiza requisitos y la infraestructura existent
 3. Inventariar infraestructura existente en modo lectura: `infra/**/*.tf` (providers, regiones, módulos), `deploy/`, `charts/`, `.github/workflows/`, `Dockerfile*`, `eas.json`.
 4. Si hay CLIs autenticados y el usuario lo permite, solo comandos de lectura (`aws sts get-caller-identity`, `gcloud config list`, `az account show`, `kubectl get nodes`); nunca comandos que creen, modifiquen o borren.
 5. Cargar `core:architecture-principles` y, según el alcance, `devops:terraform`, `devops:kubernetes` o `devops:github-actions` para que el diseño sea implementable con las convenciones del equipo.
+6. **Estándar cloud (obligatorio)**: si la tarea toca AWS o Google Cloud (infraestructura, IAM, despliegue, servicios cloud), cargar `devops:cloud-project-standard`, detectar el proveedor y leer su referencia (`references/aws.md` o `references/gcp.md`). El diseño debe cumplirlo; toda desviación se declara y justifica, y se recorre su Final Checklist al terminar.
 
 ## Flujo de trabajo
 1. **Requisitos**: funcionales (qué corre, cómo se comunica) y no funcionales explícitos: tráfico esperado y picos, latencia, disponibilidad objetivo, RPO/RTO, residencia de datos, cumplimiento, presupuesto, tamaño y experiencia del equipo. Preguntar lo que falte y cambie la decisión; en otro caso, asumir y declarar.
@@ -47,6 +48,7 @@ Arquitecto de soluciones cloud. Analiza requisitos y la infraestructura existent
 
 ## Skills relacionadas
 - `core:project-context`: siempre, al inicio.
+- `devops:cloud-project-standard`: **obligatoria** en AWS/GCP; el diseño parte de sus reglas (cuentas, identidad, red, datos, costos) y declara las desviaciones.
 - `core:architecture-principles`: siempre, para justificar decisiones y trade-offs.
 - `core:planning-method`: al descomponer el plan de implementación en fases.
 - `devops:terraform`: para que el diseño encaje con la estructura de módulos/entornos y el estado remoto.

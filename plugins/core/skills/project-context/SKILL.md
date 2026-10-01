@@ -54,6 +54,7 @@ Devuelve: gestor de paquetes, tecnologías detectadas con su versión declarada,
 | `.github/workflows/` | CI/CD | `devops:github-actions` | `devops:devops-engineer` |
 | `Chart.yaml`, `kustomization.yaml`, manifiestos `apiVersion:` | Kubernetes | `devops:kubernetes` | `devops:devops-engineer` |
 | `*.tf` | Terraform | `devops:terraform` | `devops:iac-developer` |
+| `provider "aws"`, `@aws-sdk/*`, `boto3`, `aws-cdk`, `cdk.json`, `aws-actions/*`; `provider "google"`, `@google-cloud/*`, `google-cloud-*`, `cloudbuild.yaml`, `google-github-actions/*` | Cloud (AWS / Google Cloud) | `devops:cloud-project-standard` (**obligatoria** cuando la tarea toca infraestructura, despliegue, IAM o servicios cloud) | `devops:cloud-architect` (diseño), `devops:iac-developer`, `devops:devops-engineer` |
 
 Tabla completa de señales (lockfiles, archivos de config, variantes) en [references/stack-signals.md](references/stack-signals.md). Léela cuando el detector no sea concluyente o sea un monorepo.
 
@@ -69,7 +70,7 @@ Los comandos `/feature`, `/standard` e `/implement` aceptan una **especialidad**
 | `back` (`backend`, `api`) | NestJS, FastAPI, base de datos, contratos de API | `backend:nestjs-module`, `backend:fastapi-endpoint`, `backend:database-patterns`, `backend:backend-testing` | `backend:nestjs-developer`, `backend:fastapi-developer`, `backend:api-designer` | `backend:backend-reviewer` |
 | `ia` (`ai`, `llm`) | LangChain, LangGraph, LangSmith | `backend:langchain-chains`, `backend:langchain-rag`, `backend:langgraph-agents`, `backend:langsmith-observability`, `backend:backend-testing` | `backend:langchain-developer`, `backend:langgraph-developer`, `backend:langsmith-specialist` | `backend:backend-reviewer` |
 | `mobile` (`movil`) | Expo, React Native | `mobile:expo-project-standard`, `mobile:react-native-components`, `mobile:expo-router-navigation`, `mobile:mobile-state-data`, `mobile:mobile-testing` | `mobile:expo-developer`, `mobile:react-native-developer` | `mobile:mobile-reviewer` |
-| `devops` (`infra`) | Docker, CI/CD, Kubernetes, Terraform | `devops:docker`, `devops:github-actions`, `devops:kubernetes`, `devops:terraform` | `devops:devops-engineer`, `devops:iac-developer`, `devops:cloud-architect` (solo diseño) | `devops:security-auditor` |
+| `devops` (`infra`, `cloud`) | Docker, CI/CD, Kubernetes, Terraform, AWS / Google Cloud | `devops:cloud-project-standard` (obligatoria si la tarea toca infraestructura, despliegue o servicios cloud), `devops:docker`, `devops:github-actions`, `devops:kubernetes`, `devops:terraform` | `devops:devops-engineer`, `devops:iac-developer`, `devops:cloud-architect` (solo diseño) | `devops:security-auditor` |
 
 Cómo aplicarla (los comandos remiten aquí):
 

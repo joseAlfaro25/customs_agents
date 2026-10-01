@@ -7,6 +7,7 @@ secretos o ejecutar comandos destructivos.
   también revisa los archivos tocados por `apply_patch`.
 
 Nunca falla: ante cualquier error, deja pasar la acción."""
+
 import json
 import re
 import sys
@@ -17,15 +18,38 @@ SECRET_FILE = re.compile(
     r"|.*\.p12|.*\.pfx|credentials\.json|service-account.*\.json|\.npmrc|\.pypirc)$"
 )
 DANGEROUS = [
-    (r"\brm\s+-[a-zA-Z]*r[a-zA-Z]*f?[a-zA-Z]*\s+(/|~|\$HOME)(\s|$)", "borrado recursivo de / o del home"),
+    (
+        r"\brm\s+-[a-zA-Z]*r[a-zA-Z]*f?[a-zA-Z]*\s+(/|~|\$HOME)(\s|$)",
+        "borrado recursivo de / o del home",
+    ),
     (r"\bgit\s+push\b(?=.*(--force(?!-with-lease)|\s-f\b))", "git push --force"),
     (r"\bgit\s+reset\s+--hard\b", "git reset --hard (descarta cambios)"),
     (r"\bgit\s+clean\s+-[a-zA-Z]*f", "git clean (borra archivos no versionados)"),
     (r"\bterraform\s+(apply|destroy)\b", "terraform apply/destroy"),
     (r"\bkubectl\s+(apply|delete|replace|drain|scale)\b", "kubectl sobre un cluster"),
+    (r"\baws\s+s3\s+(rm|rb|mv|sync)\b", "aws s3 que borra, mueve o sincroniza objetos"),
+    (
+        r"\baws\b[^|;&\n]*?\s(create|delete|put|update|terminate|modify|attach|detach|revoke|authorize|remove"
+        r"|deregister|register|run|stop|reboot|disable|enable|release|associate|disassociate|restore|reset"
+        r"|rotate|schedule|tag|untag|purge|publish)-[a-z0-9-]+",
+        "aws CLI que crea, modifica o borra recursos",
+    ),
+    (r"\baws\s+lambda\s+invoke\b", "aws lambda invoke (ejecuta código en la nube)"),
+    (
+        r"\bgcloud\s+(?!components\b)[^|;&\n]*?\b(create|delete|update|deploy|enable|disable|resize|restore|reset"
+        r"|stop|submit|set-iam-policy|add-iam-policy-binding|remove-iam-policy-binding)\b",
+        "gcloud que crea, modifica o borra recursos",
+    ),
+    (
+        r"\b(gcloud\s+storage|gsutil)\s+(rm|mv|rsync)\b",
+        "gcloud storage/gsutil que borra, mueve o sincroniza objetos",
+    ),
     (r"\bhelm\s+(install|upgrade|uninstall|delete)\b", "helm sobre un cluster"),
     (r"\bdocker\s+(push|system\s+prune)\b", "docker push/prune"),
-    (r"\beas\s+(build|submit|update)\b", "EAS build/submit/update (servicio de pago/público)"),
+    (
+        r"\beas\s+(build|submit|update)\b",
+        "EAS build/submit/update (servicio de pago/público)",
+    ),
     (r"\b(DROP\s+(TABLE|DATABASE)|TRUNCATE)\b", "SQL destructivo"),
 ]
 
@@ -36,17 +60,26 @@ PATCH_FILE = re.compile(r"^\*\*\* (?:Add|Update|Delete) File: (.+)$", re.MULTILI
 
 def ask(reason: str) -> None:
     if CODEX:
-        decision, suffix = "deny", ("Bloqueado por seguridad: pide confirmación explícita al usuario "
-                                    "y, si la da, que lo ejecute él mismo")
+        decision, suffix = (
+            "deny",
+            (
+                "Bloqueado por seguridad: pide confirmación explícita al usuario "
+                "y, si la da, que lo ejecute él mismo"
+            ),
+        )
     else:
         decision, suffix = "ask", "Confirma si quieres continuar"
-    print(json.dumps({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": decision,
-            "permissionDecisionReason": f"[core guard] {reason}. {suffix}.",
-        }
-    }))
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": decision,
+                    "permissionDecisionReason": f"[core guard] {reason}. {suffix}.",
+                }
+            }
+        )
+    )
 
 
 def edited_paths(tin: dict) -> list:
@@ -73,7 +106,9 @@ def main() -> None:
         cmd = str(tin.get("command", ""))
         for pattern, label in DANGEROUS:
             if re.search(pattern, cmd, re.IGNORECASE):
-                ask(f"Comando potencialmente destructivo o que afecta entornos reales ({label})")
+                ask(
+                    f"Comando potencialmente destructivo o que afecta entornos reales ({label})"
+                )
                 return
 
 

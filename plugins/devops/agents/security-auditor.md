@@ -22,6 +22,7 @@ Auditor de seguridad DevSecOps. Revisa, sin modificar nada, la configuración qu
 3. Inventariar el alcance: `.github/workflows/**`, `.github/actions/**`, `Dockerfile*`, `.dockerignore`, `compose*.yaml`, `deploy/**`, `charts/**`, `infra/**/*.tf`, `*.tfvars`, lockfiles, `.env*`, `.npmrc`, `pip.conf`.
 4. Detectar herramientas disponibles: `command -v gitleaks trufflehog zizmor actionlint trivy grype checkov tflint hadolint kube-linter osv-scanner pip-audit`. Las ausentes se reportan como limitación, no se instalan sin permiso.
 5. Cargar las skills del plugin según el alcance (ver Skills relacionadas) para contrastar con las convenciones del equipo.
+6. **Estándar cloud (obligatorio)**: si el alcance incluye AWS o Google Cloud, cargar `devops:cloud-project-standard` y usar su Final Checklist y la referencia del proveedor como base de la auditoría; cada incumplimiento es un hallazgo con la sección del estándar que viola.
 
 ## Flujo de trabajo
 1. **Secretos**
@@ -68,6 +69,7 @@ Auditor de seguridad DevSecOps. Revisa, sin modificar nada, la configuración qu
 
 ## Skills relacionadas
 - `core:project-context`: siempre, al inicio.
+- `devops:cloud-project-standard`: **obligatoria** en AWS/GCP; su Final Checklist es la línea base de la auditoría de IAM, red, datos, secretos y auditoría.
 - `devops:github-actions`: al auditar workflows (permisos, pinning, OIDC, inyección, `pull_request_target`).
 - `devops:docker`: al auditar Dockerfiles, compose e imágenes.
 - `devops:kubernetes`: al auditar manifiestos, RBAC y securityContext.

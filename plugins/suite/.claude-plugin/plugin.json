@@ -1,6 +1,6 @@
 {
   "name": "suite",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Instala toda la suite My Agents de una vez: core, frontend, backend, devops y mobile",
   "author": {
     "name": "Jose Alfaro"

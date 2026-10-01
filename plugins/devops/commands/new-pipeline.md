@@ -18,6 +18,7 @@ Crea un workflow de GitHub Actions. Argumentos recibidos: `$ARGUMENTS`
 3. Carga `devops:github-actions` y lee `references/ci.md` (tipo `ci`) o `references/cd.md` (tipo `cd`) de esa skill.
 4. Carga `core:git-workflow` para alinear ramas y tags con los triggers.
 5. Para `cd`, carga también `devops:docker` y, si hay manifiestos de Kubernetes o Helm, `devops:kubernetes`.
+6. Si el pipeline despliega a AWS o Google Cloud (o autentica contra ellos), carga `devops:cloud-project-standard` (**obligatoria**) y su referencia del proveedor: OIDC / Workload Identity Federation restringido al repo y al environment, roles separados para `plan` y `apply`, imagen por digest y aprobación para producción.
 
 ## 3. Detectar el stack y el estado actual
 - Workflows existentes en `.github/workflows/`: si ya hay un CI/CD equivalente, resume qué hace y qué le falta y propón modificarlo en lugar de crear uno paralelo. No sobrescribas sin confirmación.

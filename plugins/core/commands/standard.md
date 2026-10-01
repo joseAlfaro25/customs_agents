@@ -17,6 +17,7 @@ Si `$ARGUMENTS` está vacío, pide la descripción de la tarea y detente.
    - React sin Next: `frontend:react-components`, `frontend:typescript-patterns`, `frontend:frontend-testing`.
    - Expo / React Native: `mobile:expo-project-standard` (completo, aunque el proyecto ya exista), `mobile:react-native-components`, `mobile:expo-router-navigation`, `mobile:mobile-state-data`, `mobile:mobile-testing`.
    - Backend, IA y devops: todas las skills del mapa de `core:project-context` para los stacks que toca la tarea (p. ej. `backend:fastapi-endpoint` + `backend:database-patterns` + `backend:backend-testing`; `backend:langgraph-agents` + `backend:langsmith-observability`).
+   - **Cloud (AWS / Google Cloud) — obligatorio**: `devops:cloud-project-standard` (completo, aunque la infraestructura ya exista) siempre que la tarea cree o modifique infraestructura, IAM, despliegues o pipelines hacia la nube, o use SDKs de servicios cloud en el código. Más `devops:terraform`, `devops:github-actions`, `devops:docker` o `devops:kubernetes` según lo que toque. Si no está claro el proveedor, pregúntalo. Esta regla no se omite ni se relaja por "es un cambio pequeño".
 4. Muestra la lista al usuario en una línea por skill, indicando la especialidad si la hay.
 
 **Precedencia**: `CLAUDE.md` del proyecto > estándar de proyecto (`*-project-standard`) > skills de stack > `core:coding-standards`. Si el código existente contradice el estándar, el código **nuevo** sigue el estándar; no migres código existente fuera del alcance: anota la desviación y pregunta.

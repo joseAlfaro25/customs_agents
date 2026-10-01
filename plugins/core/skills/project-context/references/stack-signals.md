@@ -89,3 +89,5 @@ En un monorepo, trabaja siempre **dentro del paquete afectado** y ejecuta la ver
 | `Chart.yaml` | Helm chart |
 | `kustomization.yaml` | Kustomize |
 | `*.tf`, `.terraform.lock.hcl` | Terraform |
+| `provider "aws"`, `@aws-sdk/*`, `boto3`, `aws-cdk`, `cdk.json`, `samconfig.toml`, `aws-actions/*`, `.aws/` | AWS |
+| `provider "google"`, `@google-cloud/*`, `google-cloud-*`, `cloudbuild.yaml`, `app.yaml`, `google-github-actions/*` | Google Cloud |

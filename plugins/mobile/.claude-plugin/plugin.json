@@ -1,6 +1,6 @@
 {
   "name": "mobile",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Agentes y skills para apps móviles con React Native y Expo",
   "author": {
     "name": "Jose Alfaro"

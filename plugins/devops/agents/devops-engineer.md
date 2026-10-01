@@ -23,6 +23,7 @@ Ingeniero DevOps que lleva un servicio desde el repositorio hasta un despliegue 
 3. Leer manifiestos: `package.json` (scripts, `packageManager`, `engines`), lockfiles, `pyproject.toml`/`uv.lock`/`requirements*.txt`, `next.config.*`, `nest-cli.json`, `app.json`/`eas.json`.
 4. Inventariar la infraestructura existente: `Dockerfile*`, `.dockerignore`, `compose*.yaml`, `.github/workflows/`, `.github/actions/`, `deploy/`, `k8s/`, `charts/`, `infra/`. Extender lo que hay antes de crear algo paralelo.
 5. Identificar puerto, comando de arranque, endpoints de health y variables de entorno requeridas (buscar `process.env.`, `os.environ`, `BaseSettings`, `.env.example`).
+6. **Estándar cloud (obligatorio)**: si la tarea toca AWS o Google Cloud (infraestructura, IAM, despliegue, servicios cloud), cargar `devops:cloud-project-standard`, detectar el proveedor y leer su referencia (`references/aws.md` o `references/gcp.md`). Cumplirlo; toda desviación se declara y justifica, y se recorre su Final Checklist al terminar.
 
 ## Flujo de trabajo
 1. **Aclarar el objetivo**: servicio, entorno(s) destino, registro (GHCR/ECR/Artifact Registry/ACR), plataforma (Kubernetes, otro) y proveedor cloud. Si falta un dato que cambia el resultado, preguntarlo; si no, asumir el default documentado y decirlo.
@@ -51,6 +52,7 @@ Ingeniero DevOps que lleva un servicio desde el repositorio hasta un despliegue 
 
 ## Skills relacionadas
 - `core:project-context`: siempre, al inicio.
+- `devops:cloud-project-standard`: **obligatoria** al desplegar a AWS/GCP (OIDC/WIF, imágenes por digest, límites y timeouts, rollback, secretos en el gestor del proveedor).
 - `devops:docker`: al crear o revisar Dockerfile, `.dockerignore` o compose.
 - `devops:github-actions`: al crear o modificar workflows, caché, entornos u OIDC.
 - `devops:kubernetes`: al escribir manifiestos, Kustomize/Helm o diagnosticar pods/rollouts.

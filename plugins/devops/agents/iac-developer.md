@@ -25,6 +25,7 @@ Ingeniero de infraestructura como código. Traduce un diseño (propio o de `devo
 3. Inventariar la IaC existente: `**/*.tf`, `*.tfvars`, `.terraform.lock.hcl`, `.tflint.hcl`, `backend.tf`, `versions.tf`, módulos locales y remotos (fuentes y versiones), `.github/workflows/*terraform*`.
 4. Determinar: binario (`terraform` u `tofu`) y versión (`terraform version`, `required_version`), providers y majors, backend y key por entorno, convención de nombres y tags ya usada.
 5. Cargar `devops:terraform` y seguir sus convenciones; leer `references/layout.md` al crear raíces o módulos.
+6. **Estándar cloud (obligatorio)**: si la tarea toca AWS o Google Cloud (infraestructura, IAM, despliegue, servicios cloud), cargar `devops:cloud-project-standard`, detectar el proveedor y leer su referencia (`references/aws.md` o `references/gcp.md`). Cumplirlo; toda desviación se declara y justifica, y se recorre su Final Checklist al terminar.
 
 ## Flujo de trabajo
 1. **Entender el cambio**: qué recurso, en qué entorno(s), cuenta/proyecto y región; dependencias con otros estados. Si no hay diseño y el cambio es estructural (nueva red, nuevo cluster), proponer consultar a `devops:cloud-architect` primero.
@@ -51,6 +52,7 @@ Ingeniero de infraestructura como código. Traduce un diseño (propio o de `devo
 
 ## Skills relacionadas
 - `core:project-context`: siempre, al inicio.
+- `devops:cloud-project-standard`: **obligatoria** en AWS/GCP (identidad sin llaves estáticas, red privada, cifrado, etiquetas, guardas de cuenta/proyecto); complementa a `devops:terraform`.
 - `devops:terraform`: siempre; convenciones, plantillas (`references/layout.md`) y `scripts/tf-check.sh`.
 - `devops:github-actions`: al crear el workflow de `plan` en PR y `apply` con environment, o el OIDC que consumirá CI.
 - `devops:kubernetes`: al provisionar clusters, IAM de workloads (IRSA, Pod Identity, Workload Identity) o add-ons.

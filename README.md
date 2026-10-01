@@ -63,7 +63,7 @@ plugins/
 │   └── hooks/     formatea con ruff / prettier local
 ├── devops/
 │   ├── agents/    devops-engineer, cloud-architect, iac-developer, security-auditor
-│   ├── skills/    docker, github-actions, kubernetes, terraform
+│   ├── skills/    docker, github-actions, kubernetes, terraform, cloud-project-standard (AWS / GCP, obligatoria)
 │   ├── commands/  /dockerize, /new-pipeline
 │   └── hooks/     terraform fmt
 └── mobile/
@@ -203,9 +203,13 @@ Qué adapta el export:
 | `back` (`backend`, `api`) | NestJS · FastAPI · base de datos | `/feature back endpoint para exportar pedidos a CSV` |
 | `ia` (`ai`, `llm`) | LangChain · LangGraph · LangSmith | `/implement ia agente de soporte con human-in-the-loop` |
 | `mobile` (`movil`) | Expo · React Native | `/standard mobile pantalla de detalle de pedido` |
-| `devops` (`infra`) | Docker · CI/CD · Kubernetes · Terraform | `/feature devops pipeline de deploy a staging` |
+| `devops` (`infra`, `cloud`) | Docker · CI/CD · Kubernetes · Terraform · AWS / Google Cloud | `/feature devops pipeline de deploy a staging` |
 
 Con especialidad, la suite no sale de su frente: si el trabajo de `front` necesita un endpoint nuevo, lo reporta como dependencia (qué contrato hace falta) y te pregunta si lo corre aparte con `back`. La tabla completa está en `core:project-context` §3.1.
+
+### Estándar cloud obligatorio (AWS / Google Cloud)
+
+`devops:cloud-project-standard` es obligatorio siempre que la tarea cree o modifique infraestructura, IAM, despliegues o pipelines hacia la nube, o use SDKs de servicios cloud. `/standard` lo carga completo y recorre su **Final Checklist** al terminar; los agentes `devops:*` lo cargan antes de trabajar. Cubre cuentas/proyectos y entornos, identidad sin llaves estáticas (roles por workload, OIDC / Workload Identity Federation), secretos, red privada, cómputo, datos, IaC, CI/CD, etiquetas, auditoría, costos y operación segura de agentes; detecta el proveedor por las señales del repo y, si no es claro, lo pregunta.
 
 Si un nombre de comando choca con otro plugin, usa la forma con namespace: `/core:review`, `/backend:new-langgraph-agent`, etc.
 
@@ -219,7 +223,7 @@ También puedes invocar cualquier agente directamente, p. ej. *"usa el agente ba
 
 | Plugin | Evento | Qué hace |
 |---|---|---|
-| core | PreToolUse | (En Codex, bloquea con el motivo, porque Codex no soporta "ask".) Pide confirmación antes de editar `.env`, llaves o credenciales, y antes de `git push --force`, `reset --hard`, `terraform apply/destroy`, `kubectl apply/delete`, `docker push`, `eas build/submit/update`, SQL destructivo |
+| core | PreToolUse | (En Codex, bloquea con el motivo, porque Codex no soporta "ask".) Pide confirmación antes de editar `.env`, llaves o credenciales, y antes de `git push --force`, `reset --hard`, `terraform apply/destroy`, `kubectl apply/delete`, comandos de `aws` / `gcloud` / `gsutil` que crean, modifican o borran recursos, `docker push`, `eas build/submit/update`, SQL destructivo |
 | frontend, mobile | PostToolUse | Formatea el archivo editado con el prettier del proyecto (si existe) |
 | backend | PostToolUse | `ruff format` + `ruff check --fix` en `.py`; prettier en TS/JS |
 | devops | PostToolUse | `terraform fmt` en `.tf` |
