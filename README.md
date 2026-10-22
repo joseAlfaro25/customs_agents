@@ -151,6 +151,14 @@ python3 /ruta/a/My-Agents/scripts/export.py --target codex --dest /ruta/a/tu-pro
 
 Sin plugins, `--target codex` sin `--skip-skills` también copia las skills a `.agents/skills`.
 
+**Eficiencia en Codex.** Cada subagente de Codex arranca con todo el contexto fijo (instrucciones, skills y herramientas), hereda el historial del coordinador salvo que se indique lo contrario y vuelve a leer el código; además, su informe se reenvía en cada llamada del coordinador. Por eso el export a Codex:
+
+- Escribe en `AGENTS.md` un bloque corto propio (Codex ya lista skills y agentes) con reglas de cuándo delegar: tareas chicas o medianas sin subagentes, un solo review por cambio y ningún `planner` si ya hay plan. Los comandos (`$feature`, `$standard`, `$review`...) conservan sus fases.
+- Indica cómo delegar: `spawn_agent` con `fork_turns: "none"` y un brief con el bloque **Contexto**, `followup_task` al mismo agente para las correcciones y `wait_agent` sin sondear.
+- Antepone a cada agente (`.codex/agents/*.toml`) que reutilice el **Contexto** del brief en vez de recargar `core:project-context`, que no lance subagentes propios y que entregue un informe breve.
+
+Si tienes instrucciones globales propias en `~/.codex/AGENTS.md` o agentes propios en `~/.codex/agents`, evita que pidan delegar por defecto o que dupliquen roles de la suite (p. ej. un `security` o un `architecture` además de `security-auditor` y `architect`): Codex sigue ambas instrucciones y multiplica los subagentes.
+
 ### Cursor, Copilot, Gemini CLI y otras
 
 ```bash

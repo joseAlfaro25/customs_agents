@@ -37,6 +37,7 @@ PLUGIN_ORDER = ["core", "frontend", "backend", "devops", "mobile"]
 TARGETS = ["codex", "cursor", "copilot", "gemini", "agents"]
 MARK_START = "<!-- my-agents:start -->"
 MARK_END = "<!-- my-agents:end -->"
+GENERATED = "# Generado por My Agents"  # cabecera de los agentes TOML de Codex
 NAMESPACED = re.compile(r"\b(core|frontend|backend|devops|mobile):([a-z0-9][a-z0-9-]*)")
 WRITE_TOOLS = {"Write", "Edit", "MultiEdit", "NotebookEdit"}
 
@@ -158,6 +159,43 @@ PLUGIN_PREAMBLE = ("> Agente de la suite My Agents. Las skills mencionadas viene
                    "(nombres con prefijo, p. ej. `core:project-context`).\n\n")
 
 
+# En Codex cada subagente arranca con todo el contexto fijo (instrucciones, skills, herramientas), hereda el
+# historial del coordinador salvo con `fork_turns: "none"` y su informe se reenvía en cada llamada del coordinador.
+# Por eso el export a Codex añade reglas para delegar solo cuando compensa, sin heredar historial ni sondear.
+CODEX_AGENT_PREAMBLE = (
+    "> Agente de la suite My Agents, lanzado como subagente de Codex. {skills}\n"
+    ">\n"
+    "> **En Codex** (ajusta tu «Contexto inicial»):\n"
+    "> - Si el mensaje del coordinador trae el bloque **Contexto** (stack, comandos de verificación, reglas), úsalo y "
+    "no vuelvas a cargar `{project_context}` ni a ejecutar el detector. Si no lo trae, cárgala una sola vez.\n"
+    "> - Carga solo las skills que tu tarea necesita, una vez cada una. Ubica el código con `rg` y lee por rangos; "
+    "completos, solo los archivos que vas a modificar.\n"
+    "> - No lances subagentes salvo que el coordinador lo pida.\n"
+    "> - Informe final conciso (idealmente ≤ 40 líneas) con el formato de salida de tu rol: cita `archivo:línea`, "
+    "sin diffs, logs ni archivos completos. Si hace falta más detalle, el coordinador te lo pedirá.\n\n"
+)
+CODEX_SKILLS_FROM_PLUGIN = ("Las skills con prefijo (`core:project-context`) vienen de los plugins My Agents: "
+                            "usa la ruta que muestra la lista de skills de Codex.")
+CODEX_SKILLS_IN_DIR = "Las skills mencionadas están en `{skills}/<nombre>/SKILL.md`."
+CODEX_COMMAND_NOTE = ("> En Codex, delega con las reglas de «Cómo delegar» del bloque My Agents de `AGENTS.md`: "
+                      "`fork_turns: \"none\"` con un brief que incluya el bloque **Contexto**, `followup_task` al mismo "
+                      "agente para las correcciones y `wait_agent` sin sondear.\n\n")
+CODEX_PLUGIN_LABELS = {"core": "Generales", "frontend": "Frontend", "backend": "Backend e IA",
+                       "devops": "DevOps y cloud", "mobile": "Mobile"}
+
+
+def codex_agent_preamble(plugin_skills: bool, skills_dir: str) -> str:
+    skills = CODEX_SKILLS_FROM_PLUGIN if plugin_skills else CODEX_SKILLS_IN_DIR.format(skills=skills_dir)
+    project_context = "core:project-context" if plugin_skills else "project-context"
+    return CODEX_AGENT_PREAMBLE.format(skills=skills, project_context=project_context)
+
+
+def mentions_agent(text: str, agents: list[Item]) -> bool:
+    """¿El texto delega en algún agente (`core:planner`, `planner`...)?"""
+    names = "|".join(re.escape(a.name) for a in agents)
+    return bool(names) and re.search(rf"`(?:[a-z]+:)?(?:{names})`", text) is not None
+
+
 # ---------------------------------------------------------------------------- escritura
 
 class Writer:
@@ -173,7 +211,7 @@ class Writer:
 
     def write(self, rel: str, content: str | bytes, mode: int | None = None) -> None:
         path = self.dest / rel
-        if path.exists() and rel not in self.previous | self.others and not self.force:
+        if path.exists() and rel not in self.previous | self.others and not self.force and not generated(path, content):
             self.skipped.append(rel)
             return
         self.files.add(rel)
@@ -218,6 +256,15 @@ class Writer:
             self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
             self.manifest_path.write_text(json.dumps({"target": self.target, "files": sorted(self.files)}, indent=2))
         return stale
+
+
+def generated(path: Path, content: str | bytes) -> bool:
+    """Archivo de My Agents que falta en el manifiesto (p. ej. instalado por una versión anterior): se adopta."""
+    try:
+        current = path.read_bytes()
+    except OSError:
+        return False
+    return current == (content if isinstance(content, bytes) else content.encode()) or current.startswith(GENERATED.encode())
 
 
 def read_manifest(path: Path) -> set[str]:
@@ -309,6 +356,76 @@ Notas:
 """
 
 
+def codex_context_markdown(data: dict[str, list[Item]], plugin_skills: bool, skills_dir: str) -> str:
+    """Bloque corto para Codex: ya lista skills y agentes, así que solo van el contexto, las reglas de delegación y
+    los nombres. Se carga en cada llamada (y con `--user`, en todos los proyectos)."""
+    plugins = list(dict.fromkeys(i.plugin for i in data["skills"] + data["agents"] + data["commands"]))
+    if plugin_skills:
+        project_context = "core:project-context"
+        skills = (f"Las skills {', '.join(f'`{p}:*`' for p in plugins)} vienen de los plugins My Agents:\n"
+                  "  usa la ruta que muestra la lista de skills de Codex (no están en `~/.agents/skills`). En ellas,\n"
+                  "  `<carpeta de la skill X>` es la carpeta que contiene el `SKILL.md` de `X`.")
+        agent_type = ("\n- `agent_type` es el nombre sin prefijo: `core:coder` → `coder`, "
+                      "`frontend:frontend-reviewer` → `frontend-reviewer`.")
+    else:
+        project_context = "project-context"
+        skills = f"Las skills están en `{skills_dir}/<nombre>/SKILL.md`."
+        agent_type = ""
+    agents: dict[str, list[str]] = {}
+    for a in data["agents"]:
+        agents.setdefault(a.plugin, []).append(f"`{a.name}`")
+    agent_rows = "\n".join(f"- {CODEX_PLUGIN_LABELS.get(p, p)}: {', '.join(v)}" for p, v in agents.items())
+    reviewers = ", ".join(f"`{a.name}`" for a in data["agents"]
+                          if a.plugin != "core" and a.name.endswith(("-reviewer", "-auditor")))
+    review = (f"el del stack ({reviewers}) si toca uno solo,\n  o `reviewer` si cruza varios" if reviewers
+              else "`reviewer`")
+    commands = ", ".join(f"`${c.name}`" for c in data["commands"])
+    return f"""
+## My Agents (Codex)
+
+Suite **My Agents**: skills y agentes para Next.js, React, TypeScript, NestJS, FastAPI, LangChain, LangGraph,
+LangSmith, Docker, GitHub Actions, Kubernetes, Terraform, AWS / Google Cloud, React Native y Expo.
+
+### Contexto
+- Antes de planear, escribir, testear o revisar código, carga `{project_context}` **una vez por tarea**, en el hilo
+  principal, y reutiliza su resumen **Contexto** (también en el brief de cada subagente).
+- {skills}
+- Las reglas del proyecto (`AGENTS.md`, `CLAUDE.md`, docs) ganan sobre las de las skills. Sigue el código existente.
+
+### Cuándo delegar
+Cada subagente arranca con todo el contexto fijo de Codex, vuelve a leer el código y su informe se suma a tu
+contexto: delega solo cuando compense.
+- **Tarea chica o mediana** (un stack, pocos archivos: fix, ajuste de UI, rename, textos, config): hazla tú con la
+  skill del stack, sin subagentes (ni `planner`, ni `architect`, ni reviewers).
+- **Tarea grande o multi-stack**: un agente por paso independiente. Si ya hay un plan (del usuario o de `planner`),
+  no lances otro `planner`; `architect`, solo para decisiones difíciles de revertir.
+- **Un solo review por cambio**: {review}. Nunca dos roles equivalentes sobre lo mismo.
+- **Comandos** (`$feature`, `$standard`, `$review`...) o un agente pedido por el usuario: síguelos tal cual, con las
+  reglas de «Cómo delegar».
+
+### Cómo delegar
+- `spawn_agent` con `fork_turns: "none"` (en versiones anteriores, `fork_context: false`) y un brief autocontenido:
+  objetivo, criterios de aceptación, archivos y líneas ya identificados, el bloque **Contexto** y qué no tocar.
+- Correcciones tras un review: `followup_task` al agente que hizo el cambio, en vez de lanzar otro.
+- No sondees: llama a `wait_agent` solo cuando estés bloqueado, con un timeout de minutos (vuelve en cuanto termina
+  un agente), y no uses `list_agents` para ver si acabaron.
+- Pide informes breves: cambios, verificación y pendientes, sin diffs ni logs completos.{agent_type}
+
+### Agentes (`agent_type`)
+{agent_rows}
+
+### Comandos
+{commands}.
+
+### Reglas que no se negocian
+- Nunca escribas secretos en código, tests, logs ni commits; variables nuevas solo en `.env.example`, sin valor.
+- Valida toda entrada externa (incluida la salida de un LLM); SQL parametrizado; autorización en el servidor.
+- Sin confirmación explícita del usuario: no instales dependencias ni hagas commit/push, despliegues,
+  `terraform apply`, `kubectl apply` o builds/updates de EAS.
+- Antes de terminar: typecheck, lint y tests afectados con los comandos reales del proyecto; reporta el resultado.
+"""
+
+
 # ---------------------------------------------------------------------------- exportadores por target
 
 def export(target: str, data: dict[str, list[Item]], writer: Writer, user: bool, skip_skills: bool) -> None:
@@ -329,12 +446,15 @@ def export(target: str, data: dict[str, list[Item]], writer: Writer, user: bool,
     # Agentes
     for a in data["agents"]:
         desc = a.meta["description"] if skip_skills else flatten(a.meta["description"])
-        preamble = PLUGIN_PREAMBLE if skip_skills else AGENT_PREAMBLE.format(skills=skills_dir)
+        if target == "codex":
+            preamble = codex_agent_preamble(skip_skills, skills_dir)
+        else:
+            preamble = PLUGIN_PREAMBLE if skip_skills else AGENT_PREAMBLE.format(skills=skills_dir)
         body = preamble + to_text(a.body)
         if target == "codex":
             sandbox = "read-only" if a.readonly else "workspace-write"
             writer.write(f"{lay['agents']}/{a.name}.toml",
-                         f"# Generado por My Agents (plugin {a.plugin}). No editar: regenerar con scripts/export.py\n"
+                         f"{GENERATED} (plugin {a.plugin}). No editar: regenerar con scripts/export.py\n"
                          f"name = {toml_str(a.name)}\ndescription = {toml_str(desc)}\n"
                          f"sandbox_mode = {toml_str(sandbox)}\n"
                          f"developer_instructions = {toml_multiline(body)}\n")
@@ -369,9 +489,10 @@ def export(target: str, data: dict[str, list[Item]], writer: Writer, user: bool,
         if target in ("codex", "agents"):
             name = c.name if target == "codex" else f"cmd-{c.name}"
             invocation = f"${name}" if target == "codex" else name
+            codex_note = CODEX_COMMAND_NOTE if target == "codex" and mentions_agent(body, data["agents"]) else ""
             writer.write(f"{lay['skills']}/{name}/SKILL.md",
                          f"---\nname: {name}\ndescription: {yaml_str(f'Comando {invocation}: {desc}. Usar solo cuando el usuario lo invoque explícitamente.')}\n---\n\n"
-                         f"# Comando {invocation}\n\n{arg_note}{body}")
+                         f"# Comando {invocation}\n\n{arg_note}{codex_note}{body}")
             if target == "codex":
                 writer.write(f"{lay['skills']}/{name}/agents/openai.yaml",
                              f"interface:\n  display_name: {yaml_str(c.name)}\n  short_description: {yaml_str(desc[:120])}\n"
@@ -388,7 +509,9 @@ def export(target: str, data: dict[str, list[Item]], writer: Writer, user: bool,
 
     # Contexto general
     if lay.get("context"):
-        writer.context_block(lay["context"], context_markdown(data, user))
+        block = (codex_context_markdown(data, skip_skills, skills_dir) if target == "codex"
+                 else context_markdown(data, user))
+        writer.context_block(lay["context"], block)
 
 
 # ---------------------------------------------------------------------------- CLI
