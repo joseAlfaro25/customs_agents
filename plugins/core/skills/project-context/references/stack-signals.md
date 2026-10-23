@@ -67,6 +67,7 @@ En un monorepo, trabaja siempre **dentro del paquete afectado** y ejecuta la ver
 |---|---|
 | `langchain`, `langchain-core`, `langchain-<provider>` | LangChain (ver versión mayor: 1.x cambió APIs de agentes) |
 | `langgraph`, `langgraph.json` | LangGraph (y LangGraph Platform si hay `langgraph.json`) |
+| `composition.py` + `domains/*/factory.py` con `REGISTRY`, `definition.json` junto a los agentes | Agentes conversacionales con factory por reglas de negocio → `backend:agent-factory-standard` |
 | `langsmith`, `LANGSMITH_API_KEY` en `.env.example` | LangSmith tracing/evals |
 | `pgvector`, `chromadb`, `qdrant-client`, `pinecone` | Vector store |
 

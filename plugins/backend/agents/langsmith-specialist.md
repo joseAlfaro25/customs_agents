@@ -50,6 +50,7 @@ Ingeniero de observabilidad y calidad para aplicaciones LLM. Instrumenta código
 - `core:project-context`: al inicio.
 - `backend:langsmith-observability`: siempre; env vars, `@traceable`, datasets, `evaluate()`, evaluadores, prompts, monitoreo.
 - `backend:langchain-chains` y `backend:langgraph-agents`: para entender qué se traza y cómo pasar `config`.
+- `backend:agent-factory-standard`: prompts fijados por commit por ambiente y un dataset por agente hoja con `MockToolFactory` cuando el proyecto elige el agente por reglas de negocio.
 - `backend:langchain-rag`: al evaluar retrieval y respuestas con citas.
 - `backend:backend-testing`: para integrar evaluaciones en pytest/CI.
 - `core:testing-strategy`: al decidir qué se evalúa offline vs online.

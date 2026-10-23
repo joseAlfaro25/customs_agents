@@ -69,6 +69,7 @@ Checklist por categoría (aplica lo que corresponda al stack):
 - `InMemorySaver` en producción; `thread_id` derivado de input no confiable sin validar pertenencia.
 - `interrupt()` dentro de `try/except` genérico; efectos secundarios no idempotentes antes de `interrupt()`.
 - Sin tracing ni metadata en producción cuando el proyecto usa LangSmith.
+- Con factory por reglas de negocio: los antipatrones y el Final Checklist de `backend:agent-factory-standard` (factory con I/O o LLM, `if` por organización, sede o etapa dentro de un agente, tools fuera de `definition.json`, prompts sin commit por ambiente, router sin `recursion_limit`).
 
 **Tests**
 - Cambios sin tests, tests que llaman al LLM real en unit, mocks que no reflejan el contrato real.
@@ -79,6 +80,7 @@ Checklist por categoría (aplica lo que corresponda al stack):
 - `backend:database-patterns`: al revisar entidades, consultas y migraciones.
 - `backend:backend-testing`: al evaluar la calidad y cobertura de tests.
 - `backend:langchain-chains`, `backend:langgraph-agents`, `backend:langsmith-observability`: si el cambio toca código LLM.
+- `backend:agent-factory-standard`: si el proyecto elige el agente por reglas de negocio (`composition.py`, `domains/*/factory.py`, `definition.json`).
 
 ## Formato de salida
 ```
