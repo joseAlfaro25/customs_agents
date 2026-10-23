@@ -58,7 +58,8 @@ plugins/
 │   ├── agents/    nestjs-developer, fastapi-developer, api-designer, backend-reviewer,
 │   │              langchain-developer, langgraph-developer, langsmith-specialist
 │   ├── skills/    nestjs-module, fastapi-endpoint, database-patterns, backend-testing,
-│   │              langchain-chains, langchain-rag, langgraph-agents, langsmith-observability
+│   │              langchain-chains, langchain-rag, langgraph-agents, langsmith-observability,
+│   │              agent-factory-standard (agentes con factory por reglas de negocio)
 │   ├── commands/  /new-nest-resource, /new-fastapi-router, /new-langgraph-agent
 │   └── hooks/     formatea con ruff / prettier local
 ├── devops/
@@ -218,6 +219,10 @@ Con especialidad, la suite no sale de su frente: si el trabajo de `front` necesi
 ### Estándar cloud obligatorio (AWS / Google Cloud)
 
 `devops:cloud-project-standard` es obligatorio siempre que la tarea cree o modifique infraestructura, IAM, despliegues o pipelines hacia la nube, o use SDKs de servicios cloud. `/standard` lo carga completo y recorre su **Final Checklist** al terminar; los agentes `devops:*` lo cargan antes de trabajar. Cubre cuentas/proyectos y entornos, identidad sin llaves estáticas (roles por workload, OIDC / Workload Identity Federation), secretos, red privada, cómputo, datos, IaC, CI/CD, etiquetas, auditoría, costos y operación segura de agentes; detecta el proveedor por las señales del repo y, si no es claro, lo pregunta.
+
+### Estándar de agentes con factory por reglas de negocio
+
+`backend:agent-factory-standard` es obligatorio en proyectos de agentes conversacionales donde una regla de negocio elige qué agente atiende cada turno (`composition.py`, `domains/*/factory.py` con `REGISTRY`, `definition.json`). Cubre la factory como función pura sobre las dimensiones del negocio (organización, sede, etapa... → agente), la jerarquía de agentes, `definition.json` validado, prompts de LangSmith fijados por commit, el router LangGraph y los tests de tabla, precedencia y contrato. Su `SKILL.md` trae las reglas y el checklist; el esqueleto de código está en tres referencias (núcleo, runtime y dominios) que se leen según la tarea.
 
 Si un nombre de comando choca con otro plugin, usa la forma con namespace: `/core:review`, `/backend:new-langgraph-agent`, etc.
 

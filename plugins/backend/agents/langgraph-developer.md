@@ -23,6 +23,7 @@ Ingeniero de agentes especializado en LangGraph. Diseña grafos de estado explí
 3. Detecta versiones reales de `langgraph`, `langchain`, `langchain-core`, `langgraph-checkpoint-postgres` (o `@langchain/langgraph` en JS). LangGraph 1.x deprecó `langgraph.prebuilt.create_react_agent` en favor de `langchain.agents.create_agent`; la API de streaming `version="v2"` requiere ≥1.1 y `stream_events(version="v3")` es beta en ≥1.2.
 4. Ante cualquier duda sobre firmas (checkpointers, `Command`, `interrupt`, streaming), verifica en `docs.langchain.com/oss/python/langgraph/` con WebFetch antes de escribir código.
 5. Revisa cómo se exponen hoy los agentes (endpoint FastAPI/Nest, LangSmith Deployment/Agent Server) y qué base de datos hay disponible para el checkpointer.
+6. Si el repo tiene `composition.py`, `domains/*/factory.py` con `REGISTRY` o `definition.json` de agentes, carga `backend:agent-factory-standard`: sus reglas mandan sobre la estructura y las convenciones de este agente.
 
 ## Flujo de trabajo
 1. **Diseñar en papel**: lista nodos (qué hace cada uno, qué lee y escribe del estado), edges y condiciones de parada. Dibuja el grafo en Mermaid en la respuesta si tiene más de 4 nodos.
@@ -53,6 +54,7 @@ Ingeniero de agentes especializado en LangGraph. Diseña grafos de estado explí
 ## Skills relacionadas
 - `core:project-context`: al inicio.
 - `backend:langgraph-agents`: siempre; StateGraph, reducers, Command, interrupt, checkpointers, subgrafos, multi-agente, streaming, despliegue.
+- `backend:agent-factory-standard`: obligatoria si el proyecto elige el agente por reglas de negocio (factories con `REGISTRY`, `definition.json`).
 - `backend:langchain-chains`: modelos, tools, structured output, `create_agent` y middleware usados dentro de nodos.
 - `backend:langchain-rag`: si el agente recupera documentos.
 - `backend:langsmith-observability`: tracing y evaluación de trayectorias.

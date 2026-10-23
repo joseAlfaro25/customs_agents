@@ -240,6 +240,8 @@ Prueba nodos y funciones de enrutamiento como funciones puras (reciben un estado
 
 Cuando tienes varios agentes parecidos (por país, cliente o canal), conviene separar *qué* es cada agente (config) de *cómo* se ejecuta (código). Un `definition.json` describe el agente y un código genérico lo convierte en objetos de LangChain/LangGraph. Así, para cambiar un prompt, un modelo o las tools de un agente solo editas el JSON.
 
+> Esta sección es una introducción. Si además el agente se elige por reglas de negocio (organización, sede, etapa...), el estándar obligatorio, con su esqueleto verificado, es la skill `backend:agent-factory-standard`.
+
 **Estructura típica**
 
 ```json

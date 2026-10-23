@@ -17,10 +17,11 @@ Si `$ARGUMENTS` está vacío, pide la descripción de la tarea y detente.
    - React sin Next: `frontend:react-components`, `frontend:typescript-patterns`, `frontend:frontend-testing`.
    - Expo / React Native: `mobile:expo-project-standard` (completo, aunque el proyecto ya exista), `mobile:react-native-components`, `mobile:expo-router-navigation`, `mobile:mobile-state-data`, `mobile:mobile-testing`.
    - Backend, IA y devops: todas las skills del mapa de `core:project-context` para los stacks que toca la tarea (p. ej. `backend:fastapi-endpoint` + `backend:database-patterns` + `backend:backend-testing`; `backend:langgraph-agents` + `backend:langsmith-observability`).
+   - **Agentes con factory por reglas de negocio — obligatorio**: `backend:agent-factory-standard` (completo) si el repo tiene `composition.py`, `domains/*/factory.py` con `REGISTRY` o `definition.json` de agentes, o si la tarea crea agentes con ese diseño.
    - **Cloud (AWS / Google Cloud) — obligatorio**: `devops:cloud-project-standard` (completo, aunque la infraestructura ya exista) siempre que la tarea cree o modifique infraestructura, IAM, despliegues o pipelines hacia la nube, o use SDKs de servicios cloud en el código. Más `devops:terraform`, `devops:github-actions`, `devops:docker` o `devops:kubernetes` según lo que toque. Si no está claro el proveedor, pregúntalo. Esta regla no se omite ni se relaja por "es un cambio pequeño".
 4. Muestra la lista al usuario en una línea por skill, indicando la especialidad si la hay.
 
-**Precedencia**: `CLAUDE.md` del proyecto > estándar de proyecto (`*-project-standard`) > skills de stack > `core:coding-standards`. Si el código existente contradice el estándar, el código **nuevo** sigue el estándar; no migres código existente fuera del alcance: anota la desviación y pregunta.
+**Precedencia**: `CLAUDE.md` del proyecto > estándar de proyecto (`*-project-standard`, `backend:agent-factory-standard`) > skills de stack > `core:coding-standards`. Si el código existente contradice el estándar, el código **nuevo** sigue el estándar; no migres código existente fuera del alcance: anota la desviación y pregunta.
 
 ## 2. Fases
 
@@ -36,7 +37,7 @@ Ejecuta las fases de `/feature` en el mismo orden y con la misma confirmación a
 ## 3. Verificación final del estándar
 
 1. Ejecuta los scripts de calidad del proyecto que existan (`lint`, `typecheck`, `test`, `build`) y reporta el resultado real.
-2. Recorre el **Final Checklist** de cada `*-project-standard` aplicado, ítem por ítem, sobre los archivos cambiados: ✅ cumple · ❌ no cumple (con archivo y motivo) · N/A.
+2. Recorre el **Final Checklist** de cada estándar aplicado (`*-project-standard`, `backend:agent-factory-standard`), ítem por ítem, sobre los archivos cambiados: ✅ cumple · ❌ no cumple (con archivo y motivo) · N/A.
 3. Si queda algún ❌ que no se pudo corregir, dilo explícitamente; no declares la tarea terminada como "cumple el estándar".
 
 Resumen final:

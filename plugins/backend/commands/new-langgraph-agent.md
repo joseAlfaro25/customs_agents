@@ -16,6 +16,7 @@ Genera un agente LangGraph a partir de: `$ARGUMENTS`
 3. Detecta versiones reales de `langgraph`, `langchain`, `langchain-core`, proveedor de modelo y checkpointer (`langgraph-checkpoint-postgres`). Si alguna API que vas a usar no está en las skills o tienes dudas, verifícala en `docs.langchain.com` antes de escribir.
 4. Lenguaje: Python por defecto; si el backend es NestJS/TypeScript, usa `@langchain/langgraph` siguiendo los equivalentes JS de la skill.
 5. Si faltan dependencias, propón añadirlas con el gestor del proyecto (`uv add langgraph langchain langchain-<proveedor>`), indicando versiones.
+6. Si el repo elige el agente por reglas de negocio (`composition.py`, `domains/*/factory.py` con `REGISTRY`, `definition.json`), carga `backend:agent-factory-standard`: el agente nuevo es un dominio, una etapa o una variante (organización, sede...) según sus recetas, y esa estructura reemplaza la de §4.
 
 ## 3. Diseñar (mostrar antes de implementar)
 - Decide si basta `create_agent` (modelo + tools en bucle, con middleware) o se necesita un `StateGraph` propio (pasos deterministas, ramas, HITL en puntos concretos). Justifica.
